@@ -12,11 +12,12 @@ class RuleBasedModel:
     optimal prediction. 
     """
     def fit(self,data):
-        feat1 =data['f1']
-        feat3 =data['f3']
-        feat4 =data['f4']
-        feat7 =data['f7']
-        feat8 =data['f8']
+        new_data = self.prepareData(data)
+        feat1 =new_data['f1']
+        feat3 =new_data['f3']
+        feat4 =new_data['f4']
+        feat7 =new_data['f7']
+        feat8 =new_data['f8']
         
         models = [feat1, feat3, feat4, feat7, feat8]
         pred = self.majorityVote(models)
@@ -29,7 +30,10 @@ class RuleBasedModel:
             return 1.0
         
     def model(self,feat,thresh):
-        return [ self.logic(x, thresh) for x in  feat]
+        if type(feat) == list :
+            return [ self.logic(x, thresh) for x in  feat]
+        else:
+            return [self.logic(feat, thresh)]
     
     def majorityVote(self, models):
         
@@ -59,3 +63,25 @@ class RuleBasedModel:
                 count +=1
         return count / len(ypred), count, len(ypred)
     
+    def prepareData(self, data):
+        
+        new_data = {}
+        
+        for d in data:
+            for key, value in d.items():
+                if key not in new_data:
+                    new_data[key] = [value]
+                else:
+                    new_data[key].append(value)
+        return new_data
+    def predict(self,itemDict):
+        feat1 =itemDict['f1']
+        feat3 =itemDict['f3']
+        feat4 =itemDict['f4']
+        feat7 =itemDict['f7']
+        feat8 =itemDict['f8']
+        
+        models = [feat1, feat3, feat4, feat7, feat8]
+        pred = self.majorityVote(models)
+        return pred
+        
